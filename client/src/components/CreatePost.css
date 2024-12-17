@@ -1,0 +1,60 @@
+/* CreatePost.css */
+.create-post-container .ql-container {
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  background: #fefcfc;
+}
+
+.create-post-container .ql-toolbar {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  background: #f3f3f3;
+}
+
+.create-post-container .ql-editor {
+  min-height: 200px;
+  font-size: 16px;
+  background: #ffffff;
+}
+
+.create-post-container .ql-editor p {
+  margin-bottom: 0.5rem;
+}
+
+
+.create-post-container .btn-primary {
+  background-color: #4caf50;
+  border-color: #4caf50;
+}
+
+.create-post-container .btn-primary:hover {
+  background-color: #45a049;
+  border-color: #45a049;
+}
+
+
+
+
+
+/* New styles for category checkboxes */
+.category-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.category-checkbox {
+  background-color: #e8f5e9;
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 1px solid #c8e6c9;
+}
+
+.category-checkbox:hover {
+  background-color: #c8e6c9;
+}
+
+.category-checkbox input[type="checkbox"] {
+  margin-right: 5px;
+}

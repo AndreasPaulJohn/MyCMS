@@ -1,0 +1,158 @@
+.post-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-card .card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+
+
+
+
+
+
+
+/* Custom styles for the Home page */
+.page-title {
+  color: #218838;
+  text-align: center;
+  margin-bottom: 3rem;  /* Erhöhen Sie diesen Wert für mehr Abstand */
+  margin-top: 2rem; 
+  font-weight: 400;   /* Fügen Sie dies hinzu, um den oberen Abstand anzugleichen */
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+
+.post-image-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-top-left-radius: 0.75rem !important;
+  border-top-right-radius: 0.75rem !important;
+}
+
+
+
+
+/* Überschreiben der Bootstrap-Stile */
+.card-img-top {
+  border-top-left-radius: 0.75rem !important;
+  border-top-right-radius: 0.75rem !important;
+  padding: 0 !important;
+  object-fit: cover !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Zusätzliche Styles für bessere Kompatibilität */
+.card.post-card {
+  border-radius: 0.75rem !important;
+  
+}
+
+/* Entfernen Sie alle Inline-Styles aus dem img-Element in Home.js */
+.home-page .post-card .post-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover !important;
+  background-color: #f8f9fa;
+}
+
+.home-page .card-img-top {
+  border-top-left-radius: 0.75rem !important;
+  border-top-right-radius: 0.75rem !important;
+  padding: 0 !important;
+  object-fit: cover !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+
+
+.pagination .page-item .page-link {
+  color: #28a745;
+  border-color: #28a745;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+.pagination .page-item .page-link:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+  color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #6c757d;
+  border-color: #dee2e6;
+}
+
+/* Existing styles ... */
+
+
+#blocker{
+  margin-left: 150px;
+  
+}
+
+.imprint-content {
+  text-align: left;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.imprint-content p {
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .imprint-content {
+    padding: 0;
+  }
+}
+
+.contact-form input,
+.contact-form textarea,
+.contact-form .input-group {
+  background-color: #e8f0fe;
+  border: none;
+}
+ .btn-primary {
+  background-color:#28a745 !important; 
+  border-color: #28a745 !important;
+}
+
+.btn-primary:hover {
+  background-color: #28a745;
+  border-color: #32d157;
+  border: 2px;
+}
+
+.btn-primary:active {
+  background-color: #1a6d2d !important;
+  border-color: #32d157 !important;
+  border: 2px;
+}
+
+

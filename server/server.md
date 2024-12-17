@@ -1,0 +1,50 @@
+```
+└── 📁server
+    └── 📁config
+        └── db.js
+        └── readme.txt
+    └── 📁middleware
+        └── auth.js
+        └── imageProcessing.js
+        └── roleCheck.js
+    └── 📁migrations
+        └── 📁config
+            └── config.json
+        └── 📁migrations
+            └── 20240829072318-add-active-to-users.js
+            └── config.json
+        └── 20240820151340-add-can-upload-images-to-users.js
+    └── 📁models
+        └── Category.js
+        └── Comment.js
+        └── Contact.js
+        └── index.js
+        └── Media.js
+        └── Post.js
+        └── User.js
+    └── 📁routes
+        └── categories.js
+        └── comments.js
+        └── config.js
+        └── contact.js
+        └── contacts.js
+        └── postControllers.js
+        └── postHelpers.js
+        └── posts.js
+        └── postValidation.js
+        └── users.js
+    └── 📁scripts
+        └── updateAdminPermissions.js
+    └── 📁uploads
+        uillImages-1725050026307-197087241.png
+    └── 📁utils
+        └── emailService.js
+    └── .env
+    └── cleanup-database.js
+    └── package-lock.json
+    └── package.json
+    └── process.env
+    └── server.js
+    └── test-api.js
+    └── test-comments.js
+```

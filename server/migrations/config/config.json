@@ -1,0 +1,23 @@
+{
+    "development": {
+      "username": "postgres",
+      "password": "Ellitheo123456Z/",
+      "database": "MyCMS",
+      "host": "127.0.0.1",
+      "dialect": "postgres"
+    },
+    "test": {
+      "username": "postgres",
+      "password": "Ellitheo123456Z/",
+      "database": "MyCMS",
+      "host": "127.0.0.1",
+      "dialect": "postgres"
+    },
+    "production": {
+      "username": "postgres",
+      "password": "Ellitheo123456Z/",
+      "database": "MyCMS",
+      "host": "127.0.0.1",
+      "dialect": "postgres"
+    }
+  }

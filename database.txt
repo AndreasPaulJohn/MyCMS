@@ -1,0 +1,63 @@
+Based on the model definitions in your code, here's a list of all the tables and their columns that should exist in your database:
+
+posts
+
+id (INTEGER, primary key, auto-increment)
+title (STRING(255), not null)
+slug (STRING(255), not null, unique)
+content (TEXT, not null)
+author_id (INTEGER, not null, foreign key to users.id)
+published_at (DATE)
+status (STRING(20), not null, default: 'draft')
+image_url (STRING(255))
+youtube_embed (TEXT)
+media_id (INTEGER, foreign key to media.id)
+created_at (DATE, not null)
+updated_at (DATE, not null)
+
+users
+
+id (INTEGER, primary key, auto-increment)
+username (STRING(50), not null, unique)
+email (STRING(100), not null, unique)
+password_hash (STRING(255), not null)
+role (ENUM('user', 'admin', 'editor'), not null, default: 'user')
+can_upload_images (BOOLEAN, default: false)
+created_at (DATE, not null)
+updated_at (DATE, not null)
+
+categories
+
+id (INTEGER, primary key, auto-increment)
+name (STRING, not null, unique)
+slug (STRING, not null, unique)
+description (TEXT)
+created_at (DATE, not null)
+updated_at (DATE, not null)
+
+media
+
+id (INTEGER, primary key, auto-increment)
+file_name (STRING(255), not null)
+file_path (STRING(255), not null)
+file_type (STRING(50), not null)
+uploaded_by (INTEGER, not null, foreign key to users.id)
+uploaded_at (DATE, not null)
+
+PostCategories (junction table for many-to-many relationship between posts and categories)
+
+post_id (INTEGER, foreign key to posts.id)
+category_id (INTEGER, foreign key to categories.id)
+created_at (DATE, not null)
+updated_at (DATE, not null)
+
+Please verify that your database schema matches this structure. If there are any discrepancies, you may need to update your database schema or adjust your Sequelize models to match the actual database structure.
+
+If you're using migrations, make sure that all migrations have been applied correctly. If you've made manual changes to the database, you might need to create new migrations to reflect these changes in your codebase.
+
+To check your current database schema, you can use database-specific tools or commands:
+
+For PostgreSQL: Use the \d command in psql to list all tables, and \d table_name to see the structure of a specific table.
+For MySQL: Use SHOW TABLES; to list all tables, and DESCRIBE table_name; to see the structure of a specific table.
+For SQLite: Use .tables to list all tables, and .schema table_name to see the structure of a specific table.
+If you find any mismatches between your actual database schema and the structure defined in your Sequelize models, you'll need to resolve these discrepancies to fix the errors you're encountering.

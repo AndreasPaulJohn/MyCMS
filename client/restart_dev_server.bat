@@ -1,0 +1,13 @@
+@echo off
+echo Stopping development server...
+taskkill /F /IM node.exe /T
+
+echo Clearing build cache...
+rd /s /q "build"
+rd /s /q "node_modules\.cache"
+
+echo Installing dependencies...
+npm install
+
+echo Starting development server...
+npm start
