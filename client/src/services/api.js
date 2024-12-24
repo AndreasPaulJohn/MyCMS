@@ -1,15 +1,15 @@
 import axios from "axios";
-import { getAuthToken, refreshToken } from "./auth";
+import { getAuthToken, logout } from "./auth";
 import config from '../config';
 
 const api = axios.create({
-  baseURL: config.API_BASE_URL || process.env.REACT_APP_API_URL,
+  baseURL: config.API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
-
-
-
-
+// API-Funktionen
 export const generateCaptcha = async () => {
   try {
     const response = await axios.get('/api/captcha/generate');
@@ -19,8 +19,6 @@ export const generateCaptcha = async () => {
     throw error;
   }
 };
-
-
 
 export const verifyCaptcha = async (id, answer) => {
   try {
@@ -32,12 +30,6 @@ export const verifyCaptcha = async (id, answer) => {
   }
 };
 
-
-
-
-
-
-// API-Funktionen
 export const getPosts = async (page = 1, limit = 12) => {
   try {
     const response = await api.get('/posts', {
@@ -72,67 +64,6 @@ export const createPost = async (postData) => {
   }
 };
 
-// Interceptor für Anfragen
-api.interceptors.request.use(
-  async (config) => {
-    let token = getAuthToken();
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-// Interceptor für Antworten
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (error.response.status === 403 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      const newToken = await refreshToken();
-      if (newToken) {
-        originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
-        return api(originalRequest);
-      }
-    }
-    return Promise.reject(error);
-  }
-);
-
-export const getUsers = async () => {
-  try {
-    const response = await api.get("/users");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    throw error;
-  }
-};
-
-export const sendContactForm = async (formData) => {
-  try {
-    const response = await api.post("/contact", formData);
-    return response.data;
-  } catch (error) {
-    console.error("Error sending contact form:", error);
-    throw error;
-  }
-};
-
-export const deleteUser = async (userId) => {
-  try {
-    await api.delete(`/users/${userId}`);
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    throw error;
-  }
-};
-
-
-
 export const updatePost = async (id, postData) => {
   try {
     const response = await api.put(`/posts/${id}`, postData);
@@ -152,7 +83,6 @@ export const deletePost = async (id) => {
   }
 };
 
-
 export const searchPosts = async (query, category, dateFrom, dateTo) => {
   try {
     console.log('Sending search request:', { query, category, dateFrom, dateTo });
@@ -167,8 +97,6 @@ export const searchPosts = async (query, category, dateFrom, dateTo) => {
   }
 };
 
-
-
 export const createComment = async (postId, content) => {
   try {
     const response = await api.post("/comments", { post_id: postId, content });
@@ -178,8 +106,6 @@ export const createComment = async (postId, content) => {
     throw error;
   }
 };
-
-
 
 export const moderateComment = async (commentId, status) => {
   try {
@@ -222,9 +148,77 @@ export const deleteCategory = async (categoryId) => {
     throw error;
   }
 };
+
+export const getUsers = async () => {
+  try {
+    const response = await api.get("/users");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+};
+
+export const deleteUser = async (userId) => {
+  try {
+    await api.delete(`/users/${userId}`);
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw error;
+  }
+};
+
+export const sendContactForm = async (formData) => {
+  try {
+    const response = await api.post("/contact", formData);
+    return response.data;
+  } catch (error) {
+    console.error("Error sending contact form:", error);
+    throw error;
+  }
+};
+
+
+
+export const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append('image', file);
+  try {
+    const response = await api.post('/posts/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+      maxContentLength: 10000000, // 10MB
+      maxBodyLength: 10000000,
+    });
+    
+    // Logging für besseres Debugging
+    console.log('Upload response:', response.data);
+    
+    // Stellen sicher, dass die URL den korrekten Pfad hat
+    const imageUrl = response.data.url;
+    if (!imageUrl) {
+      throw new Error('No URL in upload response');
+    }
+    
+    return imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+};
+
 export const addImageToPost = async (postId, imageUrl) => {
   try {
-    const response = await api.post(`/posts/${postId}/images`, { imageUrl });
+    // Normalisiere die imageUrl
+    const normalizedUrl = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
+    
+    const response = await api.post(`/posts/${postId}/images`, { 
+      imageUrl: normalizedUrl 
+    });
+    
+    console.log('Add image response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error adding image to post:', error);
@@ -234,7 +228,16 @@ export const addImageToPost = async (postId, imageUrl) => {
 
 export const deletePostImage = async (postId, imageUrl) => {
   try {
-    const response = await api.delete(`/posts/${postId}/images`, { data: { imageUrl } });
+    // Normalisiere die imageUrl
+    const normalizedUrl = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
+    
+    const response = await api.delete(`/posts/${postId}/images`, { 
+      data: { 
+        imageUrl: normalizedUrl 
+      } 
+    });
+    
+    console.log('Delete image response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error deleting post image:', error);
@@ -242,17 +245,33 @@ export const deletePostImage = async (postId, imageUrl) => {
   }
 };
 
-export const uploadImage = async (file) => {
-  const formData = new FormData();
-  formData.append('image', file);
-  const response = await api.post('/posts/upload', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-  return response.data.url;
-};
 
+
+
+// Request interceptor
+api.interceptors.request.use(
+  async (config) => {
+    const token = getAuthToken();
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      logout();
+    }
+    return Promise.reject(error);
+  }
+);
 
 const apiService = {
   addImageToPost,

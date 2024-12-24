@@ -28,8 +28,7 @@ const EditPost = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [existingImage, setExistingImage] = useState(null);
-  // eslint-disable-next-line no-unused-vars
-  const [editorInstance, setEditorInstance] = useState(null);
+  const [editor, setEditor] = useState(null);
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -126,7 +125,7 @@ const EditPost = () => {
   };
 
   function uploadPlugin(editor) {
-    editor.plugins.get("FileRepository").createUploadAdapter = function(loader) {
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
       return uploadAdapter(loader);
     };
   }
@@ -164,7 +163,7 @@ const EditPost = () => {
                 <Form.Label>Existing Image</Form.Label>
                 <div>
                   <img
-                  alt=""
+                    alt=""
                     src={existingImage}
                     style={{ maxWidth: "100%", height: "auto" }}
                   />
@@ -185,11 +184,11 @@ const EditPost = () => {
                 editor={ClassicEditor}
                 config={{
                   ...editorConfiguration,
-                  extraPlugins: [uploadPlugin],
+                  extraPlugins: [uploadPlugin]
                 }}
                 data={content}
-                onReady={(editor) => {
-                  setEditorInstance(editor);
+                onReady={editor => {
+                  setEditor(editor);
                   console.log("Editor is ready to use!", editor);
                 }}
                 onChange={(event, editor) => {
@@ -197,11 +196,13 @@ const EditPost = () => {
                   setContent(data);
                 }}
                 onError={(error, { willEditorRestart }) => {
-                  console.error("CKEditor5 error:", error);
-                  if (willEditorRestart) {
-                    console.log("CKEditor5 will restart");
+                  if (!error.message.includes('license-key-missing')) {
+                    console.error("CKEditor5 error:", error);
+                    if (willEditorRestart) {
+                      console.log("CKEditor5 will restart");
+                    }
+                    setError(`Editor error: ${error.message}`);
                   }
-                  setError(`Editor error: ${error.message}`);
                 }}
               />
             </Form.Group>

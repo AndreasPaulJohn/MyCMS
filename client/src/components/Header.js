@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Navbar,
@@ -9,19 +9,45 @@ import {
   Button,
   NavDropdown,
 } from "react-bootstrap";
-import { logout } from "../services/auth";
 import { useAuth } from "../context/AuthContext";
-import "./components.css";
+import { toast } from 'react-toastify';
+import "./header.css";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { user, setUser, isAuthenticated, isAdminUser } = useAuth();
+  const { user, logout, isAuthenticated, isAdminUser, validateSession } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleLogout = () => {
-    logout();
-    setUser(null);
-    navigate("/login");
+  // Regelmäßige Überprüfung des Auth-Status
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      if (isAuthenticated) {
+        const isValid = await validateSession();
+        if (!isValid) {
+          // Toast wird automatisch durch validateSession ausgelöst
+          navigate('/login');
+        }
+      }
+    };
+
+    // Überprüfung alle 5 Minuten
+    const interval = setInterval(checkAuthStatus, 5 * 60 * 1000);
+    
+    // Initiale Überprüfung
+    checkAuthStatus();
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, validateSession, navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Erfolgreich abgemeldet');
+      navigate("/login");
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Fehler beim Abmelden');
+    }
   };
 
   const handleSearch = (e) => {
@@ -30,8 +56,10 @@ const Header = () => {
       navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
     }
   };
+
   return (
-    <Navbar expand="lg" className="mb-3 lightGreen ">
+    
+    <Navbar expand="lg" className="mb-3 bg-header">
       <Container>
         <Navbar.Brand
           className="bootstrap-success-green-header"
@@ -41,9 +69,9 @@ const Header = () => {
         >
           &#127808;CodeClover
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav " />
-        <Navbar.Collapse id="basic-navbar ">
-          <Nav className="me-auto ">
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar">
+          <Nav className="me-auto">
             <Nav.Link as={Link} to="/" aria-label="Home page">
               Home
             </Nav.Link>
@@ -55,12 +83,12 @@ const Header = () => {
             </Nav.Link>
             {isAdminUser && (
               <Nav.Link as={Link} to="/admin/users">
-              User
+                User
               </Nav.Link>
             )}
             {isAdminUser && (
               <Nav.Link as={Link} to="/categories">
-              Categories
+                Categories
               </Nav.Link>
             )}
           </Nav>
@@ -76,7 +104,7 @@ const Header = () => {
             />
             {searchTerm.trim() && (
               <Button
-                className="search-button "
+                className="search-button"
                 type="submit"
                 aria-label="Suche"
               >

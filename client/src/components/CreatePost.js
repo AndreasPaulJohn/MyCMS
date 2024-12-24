@@ -13,8 +13,7 @@ const CreatePost = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [error, setError] = useState("");
-  // eslint-disable-next-line no-unused-vars
-  const [editorInstance, setEditorInstance] = useState(null);
+  const [editor, setEditor] = useState(null);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [captcha, setCaptcha] = useState({ id: "", question: "" });
@@ -89,7 +88,7 @@ const CreatePost = () => {
   };
 
   function uploadPlugin(editor) {
-    editor.plugins.get("FileRepository").createUploadAdapter = function(loader) {
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
       return uploadAdapter(loader);
     };
   }
@@ -132,11 +131,11 @@ const CreatePost = () => {
             editor={ClassicEditor}
             config={{
               ...editorConfiguration,
-              extraPlugins: [uploadPlugin],
+              extraPlugins: [uploadPlugin]
             }}
             data={content}
-            onReady={(editor) => {
-              setEditorInstance(editor);
+            onReady={editor => {
+              setEditor(editor);
               console.log("Editor is ready to use!", editor);
             }}
             onChange={(event, editor) => {
@@ -144,11 +143,13 @@ const CreatePost = () => {
               setContent(data);
             }}
             onError={(error, { willEditorRestart }) => {
-              console.error("CKEditor5 error:", error);
-              if (willEditorRestart) {
-                console.log("CKEditor5 will restart");
+              if (!error.message.includes('license-key-missing')) {
+                console.error("CKEditor5 error:", error);
+                if (willEditorRestart) {
+                  console.log("CKEditor5 will restart");
+                }
+                setError(`Editor error: ${error.message}`);
               }
-              setError(`Editor error: ${error.message}`);
             }}
           />
         </Form.Group>

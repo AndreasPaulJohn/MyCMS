@@ -1,0 +1,47 @@
+.navbar.bg-header {
+    background: linear-gradient(to bottom, rgba(4, 120, 0, 0.9), rgba(5, 110, 1, 0.85)) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand.bootstrap-success-green-header {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    font-weight: 500;
+}
+
+/* Navbar Links */
+.navbar.bg-header .navbar-nav .nav-link {
+    color: #ffffff !important;
+    transition: color 0.3s ease;
+    padding: 0.5rem 1rem;
+}
+
+.navbar.bg-header .navbar-nav .nav-link:hover {
+    color: #e8f5e9 !important;
+}
+
+/* Navbar Toggler */
+.navbar.bg-header .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.navbar.bg-header .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+/* Search Box */
+.navbar.bg-header .form-control {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.navbar.bg-header .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.navbar.bg-header .form-control:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+}

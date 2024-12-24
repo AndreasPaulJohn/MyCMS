@@ -7,6 +7,18 @@
 	}
 }
 
+#root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#root > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .main-container {
 	font-family: 'Lato';
 	width: fit-content;
@@ -150,4 +162,8 @@
 	background: #dddfe0;
 	color: #000;
 	box-shadow: 5px 5px 0 #b3b3b3;
+}
+
+.bg-light-green {
+    display: none;
 }

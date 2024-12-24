@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import DOMPurify from "dompurify";
 import {
@@ -13,14 +13,15 @@ import {
 } from "react-bootstrap";
 import axios from "axios";
 import "./pages.css";
+import config from "../config";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  //const [totalPosts, setTotalPosts] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const postsPerPage = 12;
 
   const createMarkup = (html) => {
@@ -28,44 +29,51 @@ const Home = () => {
   };
 
   const truncateText = (text, maxLength) => {
+    if (!text) return "";
     if (text.length <= maxLength) return text;
     return text.substr(0, maxLength) + "...";
   };
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        console.log(`Fetching posts for page ${currentPage}`);
-  
-        const response = await axios.get(
-          `/api/posts?page=${currentPage}&limit=${postsPerPage}`
-        );
-  
-        console.log("API response:", response.data);
-        setPosts(response.data.posts || []);
-        setTotalPages(response.data.totalPages || 1);
-        console.log("Posts fetched:", response.data.posts.length);
-  
-        // Debug-Logging für jeden Post
-        response.data.posts.forEach((post) => {
-          console.log(`Post ${post.id}:`, post);
-          console.log(`Post ${post.id} Media:`, post.Media);
-        });
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-        setError("Failed to fetch posts. Please try again later.");
-        setPosts([]);
-        setTotalPages(1);
-      } finally {
-        setLoading(false);
+  const fetchPosts = useCallback(async (page) => {
+    if (!page) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await axios.get(
+        `${config.API_BASE_URL}/posts?page=${page}&limit=${postsPerPage}`
+      );
+
+      // Überprüfen der Antwort
+      if (!response.data || typeof response.data !== 'object') {
+        throw new Error('Invalid response format');
       }
-    };
-  
-    fetchPosts();
-  }, [currentPage]);  // Hier ist 'setTotalPosts' entfernt
-  
+
+      setPosts(response.data.posts || []);
+      setTotalPages(response.data.totalPages || 1);
+      
+      if (isInitialLoad) {
+        setIsInitialLoad(false);
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      setError("Failed to fetch posts. Please try again later.");
+      setPosts([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
+  }, [isInitialLoad]);
+
+  useEffect(() => {
+    fetchPosts(currentPage);
+  }, [currentPage, fetchPosts]);
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber === currentPage) return;
+    setCurrentPage(pageNumber);
+  };
 
   const renderPaginationItems = () => {
     let items = [];
@@ -84,12 +92,7 @@ const Home = () => {
     return items;
   };
 
-  const handlePageChange = (pageNumber) => {
-    console.log("Changing to page:", pageNumber);
-    setCurrentPage(pageNumber);
-  };
-
-  if (loading) {
+  if (loading && isInitialLoad) {
     return (
       <Container className="loading-container">
         <Spinner animation="border" role="status">
@@ -119,18 +122,18 @@ const Home = () => {
                   className="post-card border border-success"
                   style={{ height: "300px" }}
                 >
-                  {" "}
-                  {/* Setzen Sie hier die gewünschte Höhe */}
                   <Card.Body
                     className="d-flex flex-column"
                     style={{ height: "100%" }}
                   >
-                    <Card.Title className="post-title">{post.title}</Card.Title>
+                    <Card.Title className="post-title">
+                      {truncateText(post.title, 50)}
+                    </Card.Title>
                     <div
                       className="post-content mb-2 flex-grow-1 overflow-hidden"
                       style={{ maxHeight: "100px" }}
                       dangerouslySetInnerHTML={createMarkup(
-                        truncateText(post.content, 100) // Reduzieren Sie die Textlänge
+                        truncateText(post.content, 100)
                       )}
                     />
                     {post.Categories && post.Categories.length > 0 && (
@@ -166,30 +169,31 @@ const Home = () => {
             ))}
           </Row>
 
-          {/* Paginierung */}
-          <Row className="mt-4">
-            <Col className="d-flex justify-content-center">
-              <Pagination className="justify-content-center">
-                <Pagination.First
-                  onClick={() => handlePageChange(1)}
-                  disabled={currentPage === 1}
-                />
-                <Pagination.Prev
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                />
-                {renderPaginationItems()}
-                <Pagination.Next
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                />
-                <Pagination.Last
-                  onClick={() => handlePageChange(totalPages)}
-                  disabled={currentPage === totalPages}
-                />
-              </Pagination>
-            </Col>
-          </Row>
+          {totalPages > 1 && (
+            <Row className="mt-4">
+              <Col className="d-flex justify-content-center">
+                <Pagination className="justify-content-center">
+                  <Pagination.First
+                    onClick={() => handlePageChange(1)}
+                    disabled={currentPage === 1 || loading}
+                  />
+                  <Pagination.Prev
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1 || loading}
+                  />
+                  {renderPaginationItems()}
+                  <Pagination.Next
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages || loading}
+                  />
+                  <Pagination.Last
+                    onClick={() => handlePageChange(totalPages)}
+                    disabled={currentPage === totalPages || loading}
+                  />
+                </Pagination>
+              </Col>
+            </Row>
+          )}
         </>
       )}
     </Container>

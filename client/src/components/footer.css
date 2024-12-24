@@ -1,5 +1,17 @@
+footer.bg-footer {
+    background: linear-gradient(to top, rgba(4, 120, 0, 0.9), rgba(5, 110, 1, 0.85)) !important;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    color: #ffffff !important;
+    padding: 1rem 0;
+}
 
+footer.bg-footer a {
+    color: #ffffff !important;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
 
-.bg-footer{
-    background-color: rgba(6, 128, 2, 0.239);
+footer.bg-footer a:hover {
+    color: #e8f5e9 !important;
+    text-decoration: underline;
 }

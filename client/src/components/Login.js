@@ -3,10 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
 import { generateCaptcha, verifyCaptcha } from "../services/api";
+import { toast } from 'react-toastify';
 import "./components.css";
 
 const Login = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -14,6 +15,12 @@ const Login = () => {
   const [captcha, setCaptcha] = useState({ id: "", question: "" });
   const [captchaAnswer, setCaptchaAnswer] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     fetchCaptcha();
@@ -25,29 +32,38 @@ const Login = () => {
       setCaptcha(captchaData);
     } catch (error) {
       console.error("Error fetching captcha:", error);
-      setError("Fehler beim Laden des Captchas.");
+      toast.error("Fehler beim Laden des Captchas.");
     }
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (isLoading) return;
+
     setIsLoading(true);
     setError('');
 
     try {
+      // Captcha überprüfen
       const captchaValid = await verifyCaptcha(captcha.id, captchaAnswer);
       if (!captchaValid) {
-        setError('Captcha nicht korrekt. Bitte versuchen Sie es erneut.');
+        toast.error('Captcha nicht korrekt. Bitte versuchen Sie es erneut.');
         fetchCaptcha();
+        setCaptchaAnswer("");
         setIsLoading(false);
         return;
       }
 
+      // Login durchführen
       await login({ email, password });
-      navigate('/');
+      // Die Navigation wird jetzt durch den useEffect Handler oben gesteuert
     } catch (error) {
       console.error('Login failed:', error);
-      setError(error.response?.data?.message || 'Login fehlgeschlagen. Bitte versuchen Sie es erneut.');
+      const errorMessage = error.response?.data?.message || 'Login fehlgeschlagen. Bitte versuchen Sie es erneut.';
+      toast.error(errorMessage);
+      setError(errorMessage);
+      fetchCaptcha();
+      setCaptchaAnswer("");
     } finally {
       setIsLoading(false);
     }
@@ -66,6 +82,7 @@ const Login = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
             className="form-control custom-input"
+            disabled={isLoading}
           />
           
           <Form.Control
@@ -75,6 +92,7 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
             className="form-control custom-input"
+            disabled={isLoading}
           />
 
           <Form.Group className="mb-3">
@@ -85,6 +103,7 @@ const Login = () => {
               onChange={(e) => setCaptchaAnswer(e.target.value)}
               required
               className="custom-input"
+              disabled={isLoading}
             />
           </Form.Group>
 
@@ -94,7 +113,7 @@ const Login = () => {
             className="custom-button" 
             disabled={isLoading}
           >
-            Anmelden
+            {isLoading ? 'Anmeldung läuft...' : 'Anmelden'}
           </Button>
         </Form>
         <div className="text-center mt-3">
